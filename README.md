@@ -51,4 +51,16 @@
    
 
 
+## MFA
+The mfa_scripts folder contains the following files:
+1) phase_diagrammer.wls - WM script that accepts the Hamiltonian parameters D, V, J, tb, tp, tn, tpn and produces a phase diagram.
+Example run:
+```
+phase_diagrammer.wls 0.12 0.28 1 0.5 0.4 0.4 0.05
+```
+2) task_parser.py - processes the sample_params.json task file
+3) run_calculations.sh - runs calculations via a JSON file:
+```
+run_calculations.sh sample_params.json
+```
 
