@@ -1,3 +1,35 @@
+# Neuro-predictor
+[Link to the Russian version of the README](./README_RU.md)
+The basic model does the following: given a picture of a phase diagram, it predicts four physical Hamiltonian parameters that describe this diagram.
+
+## Installation
+
+**Python 3.9.2**
+
+1. create a virtual environment folder in root `python3.9 -m venv .venv`
+2. activate the environment `source .venv/bin/activate`
+3. execute `pip install -r requirements.txt`
+
+**In the future, do everything through the environment**
+
+## Launching a web server
+
+The app folder contains the application code.
+The main endpoint is calculate-parameters, which receives an image file as input and four float parameters as output.
+
+To run the server, you need to:
+
+1. In the app folder, execute `uvicorn main:app --host 127.0.0.1 --port 8080`
+1.1. You may have to install python packages.
+2. Follow the URL http://127.0.0.1:8080
+3. After opening the app, you can drop any image from the ./tests/tests_files. The request will be sent and the Hamiltonian parameters will be returned. Prediction takes a long time on the processor, so you may need to wait 5-10 seconds.
+4. To work via console, run `python3 console_predictor.py <path_to_jpg>`
+
+## Generation of phase diagrams from csv files
+image_generation.py generates images from the source CSV files.
+DataProcessor.py iterates through all the CSV files and uses image_generation.py to generate images.
+script_labels.py creates a CSV file with labels for training.
+
 ## Machine learning models
 
 The UNET folder contains the following files:
