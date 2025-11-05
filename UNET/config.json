@@ -1,0 +1,6 @@
+{
+		"resize_images": false,
+		"input_dir" : "../learning/mfa/no_PS_rand",
+		"output_dir" : "../learning/mfa/no_PS_rand_resized",
+		"learning_dir" : "../learning/mfa/mfa_learning"
+}

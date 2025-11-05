@@ -3,16 +3,24 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import json
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # Параметры
 batch_size = 8
 image_size = (128, 128)  # Размер изображений
-train_csv = r'C:/Users/bezzz/OneDrive/Desktop/All/Acheba/Hope/Project/csv_files/train_data.csv'
-val_csv = r'C:/Users/bezzz/OneDrive/Desktop/All/Acheba/Hope/Project/csv_files/val_data.csv'
-test_csv = r'C:/Users/bezzz/OneDrive/Desktop/All/Acheba/Hope/Project/csv_files/test_data.csv'
 initial_learning_rate = 0.01  # Увеличено для ускорения переобучения
 
+def load_config(config_file='config.json'):
+    with open(config_file) as f:
+        return json.load(f)
+        
+config = load_config()
+learning_dir = config['learning_dir']
+train_csv = learning_dir+'/train_data.csv'
+val_csv = learning_dir+'/val_data.csv'
+test_csv = learning_dir+'/test_data.csv'
+        
 # Функция для загрузки изображений
 def load_image(image_path, target_size=(128, 128)):
     img = load_img(image_path, target_size=target_size)
@@ -110,8 +118,8 @@ np.save('encoder_weights.npy', encoder_weights)
 train_losses = history.history['loss']
 val_losses = history.history['val_loss']
 
-plt.figure(figsize=(10, 5))
-plt.plot(train_losses, label='Train Loss')
-plt.plot(val_losses, label='Validation Loss')
-plt.legend()
-plt.show()
+#plt.figure(figsize=(10, 5))
+#plt.plot(train_losses, label='Train Loss')
+#plt.plot(val_losses, label='Validation Loss')
+#plt.legend()
+#plt.show()

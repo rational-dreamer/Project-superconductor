@@ -1,3 +1,31 @@
+## Machine learning models
+
+The UNET folder contains the following files:
+1) processing_data - image preparation (compression from ~500x500 pixels to 224x224), creating a CSV file with markup, and splitting this file into three (train, val, test). There are two versions: for MFA and cluster1.
+2) UNET_FULL_2 - auxiliary UNET model (with encoder and decoder), heavily overtrained, functions as an autoencoder. At the end of training, it generates saved encoder weights in the encoder_weights.npy file;
+3) UNET_WE_5 - the model itself. Optionally, you can freeze the encoder at the end so that it saves the FULL model weights;
+4) dataset creation - Recreates the dataset from the folder containing the source CSV files and the "results" directory with the generated images to the "output_dataset_directory" folder, which will be used for training and testing;
+5) dataset_common_functions - an auxiliary script for running dataset_creation;
+6) test_model - the actual model metrics;
+7) parameter_distribution - to construct histograms of parameter distribution.
+
+Launch order: 1, 2, 3, 4, 6.
+
+For convenience, everything is stored in config.json:
+- "resize_images": true/false - whether to compress images;
+- "input_dir" - path to the folder with the source uncompressed images (ignored if resize_images = false);
+- "output_dir" - path to the folder with the prepared images;
+- "learning_dir" - path to the folder with the training data.
+
+**Launch of UNET training:**
+```
+./learn_UNET_mfa.sh config.json
+```
+For MFA data or
+```
+./learn_UNET_cluster1.sh config.json
+```
+For heat bath data (they differ only in the order of the parameters in the file names)
 
 ### VGG16 BN  
 The VGG16BN folder contains the following files: 
