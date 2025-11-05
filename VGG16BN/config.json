@@ -1,0 +1,6 @@
+{
+		"resize_images": false,
+		"input_dir" : "../learning/mfa/all_resized",
+		"output_dir" : "../learning/mfa/all_resized",
+		"learning_dir" : "../learning/mfa/vgg_learning"
+}

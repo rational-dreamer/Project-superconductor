@@ -1,15 +1,23 @@
 import os
 import torch
 import pandas as pd
+import json
 from sklearn.metrics import mean_squared_error
 from dataset import PreprocessedDataset
 from torch.utils.data import DataLoader
 from VGG16BN import modified_model
 
 # Пути и гиперпараметры
-weights_path = '/home/whytech/project/model_weights/model_weights.pth'
-test_csv = '/home/whytech/project/csv_files/test_data.csv'
-predictions_csv = '/home/whytech/project/csv_files/predictions.csv'
+def load_config(config_file='config.json'):
+    with open(config_file) as f:
+        return json.load(f)
+        
+config = load_config()
+
+# Пути и гиперпараметры
+weights_path = config['learning_dir']+'/model_weights.pth'
+test_csv = config['learning_dir']+'/test_data.csv'
+predictions_csv = config['learning_dir']+'/predictions.csv'
 
 batch_size = 16
 

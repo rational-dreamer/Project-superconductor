@@ -2,18 +2,13 @@ from PIL import Image
 import os
 import csv
 import pandas as pd
+import json
+import shutil
 
-# Указываем пути
-input_dir = '/home/whytech/project/result'                      # Путь к исходным изображениям
-output_dir = '/home/whytech/project/result_resized'             # Путь к измененным изображениям
+def load_config(config_file='config.json'):
+    with open(config_file) as f:
+        return json.load(f)
 
-csv_files = '/home/whytech/project/csv_files'                   # Папка для хранения всех csv файлов
-file_name = '/home/whytech/project/csv_files/name_files.csv'    # Файл с названиями изображений
-file_path = '/home/whytech/project/csv_files/path_files.csv'    # Файл с путями до изображений
-
-train_data_path = '/home/whytech/project/csv_files/train_data.csv'   # Файл с тренировочным датасетом
-val_data_path = '/home/whytech/project/csv_files/val_data.csv'       # Файл с валидационным датасетом
-test_data_path = '/home/whytech/project/csv_files/test_data.csv'     # Файл с тестовым датасетом
 
 def resize_pics(input_dir, output_dir):
     '''
@@ -42,7 +37,7 @@ def resize_pics(input_dir, output_dir):
         # Сохраняем изменённое изображение в папке назначения
         img_resized.save(os.path.join(output_dir, filename))
 
-def csv_name(output_dir):
+def csv_name(output_dir, file_name):
     '''
     Функция для получения csv файла с названиями изображений
 
@@ -59,7 +54,7 @@ def csv_name(output_dir):
          for filename in files:
             writer.writerow([filename])
 
-def csv_path(output_dir):
+def csv_path(output_dir, file_path):
     '''
     Функция для получения csv файла с путями изображений
 
@@ -76,7 +71,7 @@ def csv_path(output_dir):
         for path in file_paths:
             writer.writerow([path])
 
-def create_labels(file_name, file_path):
+def create_labels(file_name, file_path, labels_path):
     '''
     Функция для создания csv файла с разметкой
 
@@ -89,7 +84,7 @@ def create_labels(file_name, file_path):
     name = pd.read_csv(file_name, header=None, sep = '_')
 
     # Удаляем ненужные колонки
-    name = name.drop(name.columns[[0, 5, 6, 7, 8]], axis=1)
+    name = name.drop(name.columns[[0, 5, 6, 7]], axis=1)
 
     # Присваиваем новые имена колонкам
     name.columns = ['D', 'V', 'tb', 'tp']
@@ -107,13 +102,12 @@ def create_labels(file_name, file_path):
     dataset = pd.concat([path, name], axis=1)
 
     # Сохраняем полученный датафрейм
-    labels_path = '/home/whytech/project/csv_files/labels.csv'
     dataset.to_csv(labels_path, index=False)
 
     # Возвращаем путь к файлу с разметкой
     return labels_path
 
-def split_data(labels_path):
+def split_data(labels_path, train_data_path, val_data_path, test_data_path):
     '''
     Функция для разделения датасета на train, test и val
 
@@ -142,29 +136,56 @@ def split_data(labels_path):
     val_data.to_csv(val_data_path, index=False, header=True)
     test_data.to_csv(test_data_path, index=False, header=True)
 
-# Создаём папку для сохранения csv файлов
-os.makedirs(csv_files, exist_ok=True)
+def main():
 
-print(f'Начало работы с данными\n'
-      f'Изменение размеров изображений')
-print()
+    config = load_config()
+    
+    # Указываем пути из json
+    output_dir = config['output_dir']             # Путь к измененным изображениям
+    learning_dir = config['learning_dir']          # Путь до папки для хранения тренировочных данных
 
-resize_pics(input_dir, output_dir)
-print(f'Измененные изображения находятся в директории: {output_dir}')
-print()
+    csv_files = learning_dir + '/csv_files'                   # Папка для хранения всех csv файлов
+    file_name = learning_dir + '/name_files.csv'    # Файл с названиями изображений
+    file_path = learning_dir + '/path_files.csv'    # Файл с путями до изображений
 
-csv_name(output_dir)
-print('Создан csv файл с названиями изображений')
-print()
+    train_data_path = learning_dir + '/train_data.csv'   # Файл с тренировочным датасетом
+    val_data_path = learning_dir + '/val_data.csv'       # Файл с валидационным датасетом
+    test_data_path = learning_dir + '/test_data.csv'     # Файл с тестовым датасетом
+    labels_path = learning_dir + '/labels.csv'           # Файл с размеченными данными
 
-csv_path(output_dir)
-print('Создан csv файл с путями до изображений')
-print()
+    # Создаём тренировочную папку (перезапись, если существует)
+    if (os.path.exists(learning_dir)):
+        shutil.rmtree(learning_dir)
+    os.makedirs(learning_dir, exist_ok=True)
+    os.makedirs(csv_files, exist_ok=True)
 
-labels_path = create_labels(file_name, file_path)
-print(f'Размеченные данные находятся в директории: {labels_path}')
-print()
+    print(f'Начало работы с данными\n')
+    
+    # Определяем какую директорию использовать для обработки
+    if config['resize_images']:
+        input_dir = config['input_dir']               # Путь к исходным изображениям
+        print('Изменение размеров изображений')
+        resize_pics(input_dir, output_dir)
+        print(f'Измененные изображения находятся в директории: {output_dir}')
+    else:
+        print('Пропуск изменения размеров изображений (resize_images=false)')
+        print(f'Используются исходные изображения из директории: {output_dir}')        
 
-split_data(labels_path)
-print(f'Датасет разделен на 3 файла: train_data, val_data, test_data\n'
-      f'Файлы находятся в директории: {csv_files}')
+    csv_name(output_dir, file_name)
+    print('Создан csv файл с названиями изображений')
+    print()
+
+    csv_path(output_dir, file_path)
+    print('Создан csv файл с путями до изображений')
+    print()
+
+    labels_path = create_labels(file_name, file_path, labels_path)
+    print(f'Размеченные данные находятся в директории: {labels_path}')
+    print()
+
+    split_data(labels_path, train_data_path, val_data_path, test_data_path)
+    print(f'Датасет разделен на 3 файла: train_data, val_data, test_data\n'
+          f'Файлы находятся в директории: {csv_files}')      
+      
+if __name__ == "__main__":
+    main()

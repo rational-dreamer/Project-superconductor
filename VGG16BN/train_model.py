@@ -3,15 +3,22 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
+import json
 from dataset import PreprocessedDataset
 from VGG16BN import modified_model
 from torch.utils.data import DataLoader
 
+def load_config(config_file='config.json'):
+    with open(config_file) as f:
+        return json.load(f)
+        
+config = load_config()
+
 # Пути и гиперпараметры
-train_csv = '/home/whytech/project/csv_files/train_data.csv'
-val_csv = '/home/whytech/project/csv_files/val_data.csv'
-weights_path = '/home/whytech/project/model_weights/model_weights.pth'
-metrics_path = '/home/whytech/project/metrics.png'
+train_csv = config['learning_dir']+'/train_data.csv'
+val_csv = config['learning_dir']+'/val_data.csv'
+weights_path = config['learning_dir']+'/model_weights.pth'
+metrics_path = config['learning_dir']+'/metrics.png'
 
 batch_size = 16
 num_epochs = 200
